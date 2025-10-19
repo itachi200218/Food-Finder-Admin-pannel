@@ -1,6 +1,6 @@
 package com.example.demo1.service.impl;
 
-import com.example.demo1.repository.AppUserRespository;
+import com.example.demo1.repository.AppUserRepository;
 import com.example.demo1.repository.DashboardRepository;
 import com.example.demo1.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class DashboardServiceImpl implements DashboardService {
     private DashboardRepository dashboardRepository;
 
     @Autowired
-    private AppUserRespository userRepository;
+    private AppUserRepository userRepository;
 
     @Override
     public Map<String, Object> getDashboardStats() {

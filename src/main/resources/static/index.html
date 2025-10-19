@@ -6,6 +6,7 @@
     <title>Recipe Manager</title>
     <link rel="stylesheet" href="style.css">
     <script src="checkLogin.js"></script>
+
     <style>
         header {
           background: #2c2c2c;
@@ -17,6 +18,11 @@
           border-radius: 12px;
           margin-bottom: 20px;
           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-buttons {
+          display: flex;
+          align-items: center;
         }
 
         .nav-buttons button {
@@ -32,6 +38,26 @@
 
         .nav-buttons button:hover {
           background: #dfe6e9;
+        }
+
+        #geminiQuery {
+          padding: 8px 10px;
+          border-radius: 6px;
+          border: none;
+          width: 240px;
+          margin-left: 10px;
+        }
+
+        #geminiResponse {
+          margin: 20px auto;
+          background: #f5f6fa;
+          border-radius: 12px;
+          padding: 15px 20px;
+          max-width: 700px;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+          font-size: 15px;
+          color: #2d3436;
+          display: none;
         }
 
         /* Dashboard Section */
@@ -122,22 +148,55 @@
           }
         }
 
+        async function askGemini() {
+          const query = document.getElementById("geminiQuery").value.trim();
+          const responseBox = document.getElementById("geminiResponse");
+
+          if (!query) {
+            alert("Please enter a question!");
+            return;
+          }
+
+          responseBox.style.display = "block";
+          responseBox.innerHTML = "<em>Thinking...</em>";
+
+          try {
+            const response = await fetch(`http://localhost:8080/api/admin/gemini/ask?query=${encodeURIComponent(query)}`);
+            if (!response.ok) {
+              throw new Error("Gemini API failed");
+            }
+            const data = await response.text();
+            responseBox.innerHTML = "<strong>Gemini:</strong> " + data;
+          } catch (error) {
+            console.error("Error:", error);
+            responseBox.innerHTML = "<span style='color:red;'>Something went wrong while processing your query.</span>";
+          }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
           checkLogin();
           loadDashboardStats();
         });
     </script>
 </head>
-<body>
 
+<body>
 <!-- ✅ Header -->
 <header>
     <h1>🍲 Recipe Manager</h1>
     <div class="nav-buttons">
         <button onclick="viewProfile()">Profile</button>
+
+        <!-- 🧠 Gemini Query Box -->
+        <input type="text" id="geminiQuery" placeholder="Ask Gemini (e.g., 'List all usernames')">
+        <button onclick="askGemini()" style="background:#007bff; color:white;">Ask</button>
+
         <button onclick="logout()">Logout</button>
     </div>
 </header>
+
+<!-- 🧠 Gemini Response Box -->
+<div id="geminiResponse"></div>
 
 <!-- ✅ Dashboard Stats -->
 <section id="dashboard">

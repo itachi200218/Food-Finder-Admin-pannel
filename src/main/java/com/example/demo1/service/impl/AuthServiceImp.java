@@ -1,7 +1,7 @@
 package com.example.demo1.service.impl;
 
 import com.example.demo1.model.AppUser;
-import com.example.demo1.repository.AppUserRespository;
+import com.example.demo1.repository.AppUserRepository; // ✅ corrected import
 import com.example.demo1.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceImp implements AuthService {
 
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Autowired
-    AppUserRespository appUserRespository;
+    private AppUserRepository appUserRepository; // ✅ corrected variable name
 
     @Override
     public AppUser register(AppUser user) {
         user.setPassword(encoder.encode(user.getPassword()));
-        return appUserRespository.save(user);
+        return appUserRepository.save(user);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class AuthServiceImp implements AuthService {
             throw new RuntimeException("Username or password cannot be null");
         }
 
-        AppUser user = appUserRespository.findByUsername(username)
+        AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!encoder.matches(password, user.getPassword())) {
@@ -39,36 +39,35 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public AppUser forgotUsername(String email) {
-        return appUserRespository.findByEmail(email)
+        return appUserRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
     public AppUser resetPassword(String username, String currentPassword, String newPassword) {
-        AppUser user = appUserRespository.findByUsername(username)
+        AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ Check if the current password matches
         if (!encoder.matches(currentPassword, user.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }
 
-        // ✅ Encode and save the new password
         user.setPassword(encoder.encode(newPassword));
-        return appUserRespository.save(user);
+        return appUserRepository.save(user);
     }
+
     @Override
     public AppUser getProfile(String username) {
-        return appUserRespository.findByUsername(username)
+        return appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    @Override
     public AppUser updatePasswordWithoutOld(String username, String newPassword) {
-        AppUser user = appUserRespository.findByUsername(username)
+        AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String encodedPassword = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(newPassword);
-        user.setPassword(encodedPassword);
-        return appUserRespository.save(user);
+        user.setPassword(encoder.encode(newPassword));
+        return appUserRepository.save(user);
     }
-
 }
