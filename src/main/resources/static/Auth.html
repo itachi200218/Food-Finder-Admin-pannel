@@ -14,7 +14,6 @@
           height: 100vh;
           margin: 0;
         }
-
         .container {
           display: flex;
           justify-content: space-between;
@@ -26,21 +25,18 @@
           width: 900px;
           gap: 40px;
         }
-
         .form-section {
           flex: 1;
           display: flex;
           flex-direction: column;
           justify-content: center;
         }
-
         h2 {
           text-align: center;
           color: #2d3436;
           font-size: 26px;
           margin-bottom: 20px;
         }
-
         input {
           width: 100%;
           padding: 14px;
@@ -50,13 +46,11 @@
           border-radius: 8px;
           transition: 0.3s;
         }
-
         input:focus {
           border-color: #0984e3;
           outline: none;
           box-shadow: 0 0 5px rgba(9, 132, 227, 0.4);
         }
-
         button {
           width: 100%;
           background: #0984e3;
@@ -70,12 +64,10 @@
           margin-top: 10px;
           transition: background 0.3s, transform 0.1s;
         }
-
         button:hover {
           background: #0652dd;
           transform: scale(1.03);
         }
-
         .message {
           text-align: center;
           margin-top: 15px;
@@ -83,18 +75,32 @@
           font-size: 16px;
           font-weight: 500;
         }
-
         .divider {
           width: 2px;
           background-color: #ddd;
           margin: 0 15px;
         }
+        .forgot-links {
+          text-align: center;
+          margin-top: 15px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        .forgot-links a {
+          color: #0652dd;
+          font-weight: 600;
+          text-decoration: none;
+        }
+        .forgot-links a:hover {
+          text-decoration: underline;
+        }
     </style>
 </head>
-
 <body>
 <div class="container">
-    <!-- Register Section -->
+    <!-- Register -->
     <div class="form-section">
         <h2>Register</h2>
         <input type="text" id="regUsername" placeholder="Username" />
@@ -102,79 +108,74 @@
         <input type="password" id="regPassword" placeholder="Password" />
         <button onclick="registerUser()">Register</button>
     </div>
-
     <div class="divider"></div>
-
-    <!-- Login Section -->
+    <!-- Login -->
     <div class="form-section">
         <h2>Login</h2>
         <input type="text" id="loginUsername" placeholder="Username" />
         <input type="password" id="loginPassword" placeholder="Password" />
         <button onclick="loginUser()">Login</button>
+
+        <div class="forgot-links">
+            <a href="forgot-username.html">Forgot Username?</a>
+            <a href="reset-password.html">Forgot Password?</a>
+        </div>
+
         <div class="message" id="message"></div>
     </div>
 </div>
 
 <script>
-    // ✅ Register user
     async function registerUser() {
       const username = document.getElementById("regUsername").value;
       const email = document.getElementById("regEmail").value;
       const password = document.getElementById("regPassword").value;
-
       try {
-        const response = await fetch("http://localhost:8080/api/auth/register", {
+        const res = await fetch("http://localhost:8080/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, email, password })
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          document.getElementById("message").innerText = `✅ Registered: ${data.username}`;
-          document.getElementById("message").style.color = "green";
+        const msg = document.getElementById("message");
+        if (res.ok) {
+          const data = await res.json();
+          msg.innerText = `✅ Registered: ${data.username}`;
+          msg.style.color = "green";
         } else {
-          document.getElementById("message").innerText = "❌ Failed to register";
-          document.getElementById("message").style.color = "red";
+          msg.innerText = "❌ Registration failed";
+          msg.style.color = "red";
         }
-      } catch (error) {
-        document.getElementById("message").innerText = "❌ Server error during registration";
-        document.getElementById("message").style.color = "red";
-        console.error(error);
+      } catch {
+        msg.innerText = "❌ Server error";
+        msg.style.color = "red";
       }
     }
 
-    // ✅ Login user
     async function loginUser() {
       const username = document.getElementById("loginUsername").value;
       const password = document.getElementById("loginPassword").value;
-      const messageEl = document.getElementById("message");
+      const msg = document.getElementById("message");
 
       try {
-        const response = await fetch("http://localhost:8080/api/auth/login", {
+        const res = await fetch("http://localhost:8080/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ username, password })
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          messageEl.innerText = `✅ Logged in as ${data.username}`;
-          messageEl.style.color = "green";
-
-          setTimeout(() => {
-            window.location.href = "index.html";
-          }, 1200);
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("username", data.username);
+          msg.innerText = `✅ Logged in as ${data.username}`;
+          msg.style.color = "green";
+          setTimeout(() => window.location.href = "index.html", 1200);
         } else {
-          const errorText = await response.text();
-          messageEl.innerText = `❌ Invalid credentials`;
-          messageEl.style.color = "red";
+          msg.innerText = "❌ Invalid credentials";
+          msg.style.color = "red";
         }
-      } catch (error) {
-        console.error("Login error:", error);
-        messageEl.innerText = "❌ Server error during login";
-        messageEl.style.color = "red";
+      } catch {
+        msg.innerText = "❌ Server error during login";
+        msg.style.color = "red";
       }
     }
 </script>

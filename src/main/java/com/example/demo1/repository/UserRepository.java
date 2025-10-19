@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User,Integer> {
     List<User> findByCategoryId(int categoryId);
+
     @Query("SELECT u FROM User u JOIN Category c ON u.categoryId = c.id WHERE c.name = :categoryName")
     List<User> findByCategoryName(@Param("categoryName") String categoryName);
+
 }

@@ -6,44 +6,156 @@
     <title>Recipe Manager</title>
     <link rel="stylesheet" href="style.css">
     <script src="checkLogin.js"></script>
+    <style>
+        header {
+          background: #2c2c2c;
+          color: white;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 30px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-buttons button {
+          background: white;
+          color: #1f4e79;
+          border: none;
+          margin-left: 10px;
+          padding: 8px 14px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+
+        .nav-buttons button:hover {
+          background: #dfe6e9;
+        }
+
+        /* Dashboard Section */
+        #dashboard {
+          display: flex;
+          justify-content: center;
+          gap: 25px;
+          margin: 25px auto;
+          flex-wrap: wrap;
+          max-width: 1000px;
+        }
+
+        .dash-card {
+          background: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          padding: 25px 30px;
+          width: 250px;
+          text-align: center;
+          transition: transform 0.3s ease;
+        }
+
+        .dash-card:hover {
+          transform: translateY(-5px);
+        }
+
+        .dash-card h3 {
+          color: #1f4e79;
+          margin-bottom: 10px;
+        }
+
+        .dash-card p {
+          font-size: 22px;
+          font-weight: bold;
+          color: #007bff;
+        }
+    </style>
 
     <script>
         async function logout() {
-            await fetch("http://localhost:8080/api/auth/logout", {
-                method: "GET",
-                credentials: "include"
-            });
+          await fetch("http://localhost:8080/api/auth/logout", {
+            method: "GET",
+            credentials: "include"
+          });
+          localStorage.removeItem("username");
+          window.location.href = "Auth.html";
+        }
+
+        function viewProfile() {
+          const username = localStorage.getItem("username");
+          if (!username) {
+            alert("No user logged in!");
             window.location.href = "Auth.html";
+          } else {
+            window.location.href = "profile.html";
+          }
         }
 
         async function checkLogin() {
-            try {
-                const response = await fetch("http://localhost:8080/api/auth/check", {
-                    method: "GET",
-                    credentials: "include"
-                });
-                const isLoggedIn = await response.json();
-                if (!isLoggedIn) {
-                    window.location.href = "Auth.html";
-                }
-            } catch (error) {
-                console.error("Error checking login:", error);
-                window.location.href = "Auth.html";
+          try {
+            const response = await fetch("http://localhost:8080/api/auth/check", {
+              method: "GET",
+              credentials: "include"
+            });
+            const isLoggedIn = await response.json();
+            if (!isLoggedIn) {
+              window.location.href = "Auth.html";
             }
+          } catch (error) {
+            console.error("Error checking login:", error);
+            window.location.href = "Auth.html";
+          }
         }
 
-        document.addEventListener("DOMContentLoaded", checkLogin);
+        async function loadDashboardStats() {
+          try {
+            const response = await fetch("http://localhost:8080/api/dashboard/stats");
+            if (response.ok) {
+              const data = await response.json();
+              document.getElementById("totalUsers").innerText = data.totalUsers;
+              document.getElementById("topCategory").innerText = data.topCategory;
+              document.getElementById("totalRecipes").innerText = data.totalRecipes;
+            } else {
+              console.error("Failed to load stats");
+            }
+          } catch (err) {
+            console.error("Error fetching stats:", err);
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          checkLogin();
+          loadDashboardStats();
+        });
     </script>
 </head>
 <body>
-<!-- ✅ Top Bar with Logout Button -->
-<div style="display:flex; justify-content:space-between; align-items:center; padding:10px;">
-    <h1>🍲 Recipe Manager</h1>
-    <button onclick="logout()" style="background:#e74c3c; color:white; padding:8px 16px; border:none; border-radius:5px; cursor:pointer;">
-        Logout
-    </button>
-</div>
 
+<!-- ✅ Header -->
+<header>
+    <h1>🍲 Recipe Manager</h1>
+    <div class="nav-buttons">
+        <button onclick="viewProfile()">Profile</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<!-- ✅ Dashboard Stats -->
+<section id="dashboard">
+    <div class="dash-card">
+        <h3>Total Recipes</h3>
+        <p id="totalRecipes">--</p>
+    </div>
+    <div class="dash-card">
+        <h3>Total Users</h3>
+        <p id="totalUsers">--</p>
+    </div>
+    <div class="dash-card">
+        <h3>Top Category</h3>
+        <p id="topCategory">--</p>
+    </div>
+</section>
+
+<!-- ✅ Main Page Layout -->
 <div class="container">
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -57,7 +169,7 @@
         </ul>
     </aside>
 
-    <!-- Main Form -->
+    <!-- Main Section -->
     <main>
         <form id="recipeForm">
             <input type="hidden" id="recipeId">
