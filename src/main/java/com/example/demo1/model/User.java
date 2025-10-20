@@ -13,21 +13,26 @@ public class User {
 
     private String name;
 
-    @Column(length = 1000)
+    // ✅ Allow long text for ingredients
+    @Column(columnDefinition = "TEXT")
     private String ingredients;
 
-    @Column(length = 2000)
+    // ✅ Allow long text for description
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(length = 5000)
+    // ✅ Allow long text for steps
+    @Column(columnDefinition = "TEXT")
     private String steps;
 
+    // ✅ URL is optional and up to 1000 characters
+    @Column(nullable = true, length = 1000)
     private String url;
 
     @Column(name = "category_id")
     private int categoryId;
 
-    // ✅ New fields
+    // ✅ Track creation and update times
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
