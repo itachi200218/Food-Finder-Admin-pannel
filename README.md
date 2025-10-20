@@ -1,6 +1,6 @@
 🔹 Admin Panel – AI Integrated Management System
 
-A full-stack AI-powered Admin Management System for recipe and user control, featuring CRUD automation, live analytics, and a built-in Knowledge Transfer (KT) AI assistant — all built in just 5 days.
+A full-stack AI-powered Admin Management System for recipe and user control, featuring CRUD automation, live analytics, and a built-in Knowledge Transfer (KT) AI assistant .
 
 Tech Stack:
 	•	Backend: Spring Boot (Java)
