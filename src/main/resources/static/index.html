@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Manager</title>
     <link rel="stylesheet" href="style.css">
-    <script src="checkLogin.js"></script>
 
     <style>
         header {
@@ -58,6 +57,25 @@
           font-size: 15px;
           color: #2d3436;
           display: none;
+        }
+
+        /* Gemini Table Styling */
+        #geminiResponse table {
+          border: 1px solid #ccc;
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 10px;
+        }
+
+        #geminiResponse th, #geminiResponse td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+        }
+
+        #geminiResponse th {
+          background: #f4f4f4;
+          font-weight: bold;
         }
 
         /* Dashboard Section */
@@ -148,6 +166,7 @@
           }
         }
 
+        // ✅ Updated askGemini() function with Markdown → HTML Table rendering
         async function askGemini() {
           const query = document.getElementById("geminiQuery").value.trim();
           const responseBox = document.getElementById("geminiResponse");
@@ -162,11 +181,34 @@
 
           try {
             const response = await fetch(`http://localhost:8080/api/admin/gemini/ask?query=${encodeURIComponent(query)}`);
-            if (!response.ok) {
-              throw new Error("Gemini API failed");
-            }
-            const data = await response.text();
-            responseBox.innerHTML = "<strong>Gemini:</strong> " + data;
+            if (!response.ok) throw new Error("Gemini API failed");
+
+            let data = await response.text();
+
+            // 🧩 Convert Markdown-style tables to HTML
+            data = data.replace(/\|(.+)\|/gs, (match) => {
+              const rows = match
+                .trim()
+                .split("\n")
+                .filter(line => line.includes("|"))
+                .map(line =>
+                  "<tr>" +
+                  line
+                    .split("|")
+                    .filter(cell => cell.trim() !== "")
+                    .map((cell, index) => index === 0 ? `<th>${cell.trim()}</th>` : `<td>${cell.trim()}</td>`)
+                    .join("") +
+                  "</tr>"
+                )
+                .join("");
+              return `<table>${rows}</table>`;
+            });
+
+            // 💡 Make bold text render properly
+            data = data.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            data = data.replace(/\n/g, "<br>");
+
+            responseBox.innerHTML = `<strong>Admin AI:</strong><br>${data}`;
           } catch (error) {
             console.error("Error:", error);
             responseBox.innerHTML = "<span style='color:red;'>Something went wrong while processing your query.</span>";
@@ -188,7 +230,7 @@
         <button onclick="viewProfile()">Profile</button>
 
         <!-- 🧠 Gemini Query Box -->
-        <input type="text" id="geminiQuery" placeholder="Ask Gemini (e.g., 'List all usernames')">
+        <input type="text" id="geminiQuery" placeholder="Ask Admin (e.g., 'Top 3 categories with most recipes')">
         <button onclick="askGemini()" style="background:#007bff; color:white;">Ask</button>
 
         <button onclick="logout()">Logout</button>
@@ -251,6 +293,7 @@
     </main>
 </div>
 
+<!-- ✅ Only ONE script.js reference -->
 <script src="script.js"></script>
 </body>
 </html>
