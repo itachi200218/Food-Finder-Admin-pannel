@@ -2,12 +2,12 @@
 
 A full-stack AI-powered Admin Management System for recipe and user control, featuring CRUD automation, live analytics, and a built-in Knowledge Transfer (KT) AI assistant .
 
-*Tech Stack*:
-	•	Backend: Spring Boot (Java)
-	•	Frontend: HTML, CSS, JavaScript
-	•	Database: MySQL
-	•	AI Integration: Gemini API
-	•	Security: BCrypt Password Encryption
+**Tech Stack**:
+	•	**Backend**: Spring Boot (Java)
+	•	**Frontend**: HTML, CSS, JavaScript
+	•	**Database**: MySQL
+	•	**AI Integration**: Gemini API
+	•	**Security**: BCrypt Password Encryption
 
 *Features*:
 	•	Authentication & User Management: Forgot username, reset password, profile page with update options
