@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forgot Username</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          background: linear-gradient(135deg, #74b9ff, #a29bfe);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .box {
+          background: white;
+          padding: 40px;
+          border-radius: 15px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+          width: 400px;
+          text-align: center;
+        }
+        input {
+          width: 100%;
+          padding: 12px;
+          margin: 12px 0;
+          border: 2px solid #ccc;
+          border-radius: 8px;
+        }
+        button {
+          width: 100%;
+          padding: 12px;
+          background-color: #0984e3;
+          border: none;
+          color: white;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+        button:hover {
+          background-color: #0652dd;
+        }
+        .message {
+          margin-top: 15px;
+          font-weight: 500;
+        }
+        a {
+          text-decoration: none;
+          color: #0984e3;
+          display: inline-block;
+          margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>Forgot Username</h2>
+    <input type="email" id="email" placeholder="Enter your registered email" />
+    <button onclick="getUsername()">Get Username</button>
+    <div class="message" id="msg"></div>
+    <a href="Auth.html">⬅ Back to Login</a>
+</div>
+
+<script>
+    async function getUsername() {
+      const email = document.getElementById("email").value;
+      const msg = document.getElementById("msg");
+
+      try {
+        const response = await fetch("http://localhost:8080/api/auth/forgot-username", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+
+        if (response.ok) {
+          const data = await response.text();
+          msg.style.color = "green";
+          msg.innerText = data;
+        } else {
+          const err = await response.text();
+          msg.style.color = "red";
+          msg.innerText = err;
+        }
+      } catch (error) {
+        msg.style.color = "red";
+        msg.innerText = "❌ Server error";
+      }
+    }
+</script>
+</body>
+</html>

@@ -35,6 +35,10 @@ build/
 .vscode/
 
 ### Mac OS ###
+<<<<<<< HEAD
 .DS_Store
 .env
 src/main/resources/application.properties
+=======
+.DS_Store
+>>>>>>> de80e9f678c7fdc482bc3b4bfa83c067553f1c32

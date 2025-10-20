@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Manager</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        header {
+          background: #2c2c2c;
+          color: white;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 30px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-buttons {
+          display: flex;
+          align-items: center;
+        }
+
+        .nav-buttons button {
+          background: white;
+          color: #1f4e79;
+          border: none;
+          margin-left: 10px;
+          padding: 8px 14px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+
+        .nav-buttons button:hover {
+          background: #dfe6e9;
+        }
+
+        #geminiQuery {
+          padding: 8px 10px;
+          border-radius: 6px;
+          border: none;
+          width: 240px;
+          margin-left: 10px;
+        }
+
+        #geminiResponse {
+          margin: 20px auto;
+          background: #f5f6fa;
+          border-radius: 12px;
+          padding: 15px 20px;
+          max-width: 700px;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+          font-size: 15px;
+          color: #2d3436;
+          display: none;
+        }
+
+        #geminiResponse table {
+          border: 1px solid #ccc;
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 10px;
+        }
+
+        #geminiResponse th, #geminiResponse td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+        }
+
+        #geminiResponse th {
+          background: #f4f4f4;
+          font-weight: bold;
+        }
+
+        #dashboard {
+          display: flex;
+          justify-content: center;
+          gap: 25px;
+          margin: 25px auto;
+          flex-wrap: wrap;
+          max-width: 1000px;
+        }
+
+        .dash-card {
+          background: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          padding: 25px 30px;
+          width: 250px;
+          text-align: center;
+          transition: transform 0.3s ease;
+        }
+
+        .dash-card:hover {
+          transform: translateY(-5px);
+        }
+
+        .dash-card h3 {
+          color: #1f4e79;
+          margin-bottom: 10px;
+        }
+
+        .dash-card p {
+          font-size: 22px;
+          font-weight: bold;
+          color: #007bff;
+        }
+    </style>
+
+    <script>
+        async function logout() {
+          await fetch("http://localhost:8080/api/auth/logout", {
+            method: "GET",
+            credentials: "include"
+          });
+          localStorage.removeItem("username");
+          window.location.href = "Auth.html";
+        }
+
+        function viewProfile() {
+          const username = localStorage.getItem("username");
+          if (!username) {
+            alert("No user logged in!");
+            window.location.href = "Auth.html";
+          } else {
+            window.location.href = "profile.html";
+          }
+        }
+
+        async function checkLogin() {
+          try {
+            const response = await fetch("http://localhost:8080/api/auth/check", {
+              method: "GET",
+              credentials: "include"
+            });
+            const isLoggedIn = await response.json();
+            if (!isLoggedIn) {
+              window.location.href = "Auth.html";
+            }
+          } catch (error) {
+            console.error("Error checking login:", error);
+            window.location.href = "Auth.html";
+          }
+        }
+
+        async function loadDashboardStats() {
+          try {
+            const response = await fetch("http://localhost:8080/api/dashboard/stats");
+            if (response.ok) {
+              const data = await response.json();
+              document.getElementById("totalUsers").innerText = data.totalUsers;
+              document.getElementById("topCategory").innerText = data.topCategory;
+              document.getElementById("totalRecipes").innerText = data.totalRecipes;
+            } else {
+              console.error("Failed to load stats");
+            }
+          } catch (err) {
+            console.error("Error fetching stats:", err);
+          }
+        }
+
+        // ✅ Show all users from backend (no password prompt)
+    async function showAllUsers() {
+  const box = document.getElementById("geminiResponse");
+
+  // Ask for admin password
+  const password = prompt("🔐 Please enter admin password to view all users:");
+  if (!password) {
+    alert("Password is required to view users.");
+    return;
+  }
+
+  box.style.display = "block";
+  box.innerHTML = "<em>Verifying password...</em>";
+
+  // Check password before fetching users
+  const ADMIN_PASSWORD = "admin123"; // keep it same as backend or send to backend for verification
+  if (password !== ADMIN_PASSWORD) {
+    box.innerHTML = "<span style='color:red;'>❌ Incorrect password. Access denied.</span>";
+    return;
+  }
+
+  box.innerHTML = "<em>Loading all users...</em>";
+
+  try {
+    const res = await fetch("http://localhost:8080/api/auth/users");
+    if (!res.ok) throw new Error("Failed to fetch users");
+    const users = await res.json();
+
+    if (!Array.isArray(users) || users.length === 0) {
+      box.innerHTML = "<strong>No users found.</strong>";
+      return;
+    }
+
+    let html = `
+      <h3>All Users</h3>
+      <table>
+        <tr><th>ID</th><th>Username</th><th>Email</th><th>Last Updated</th></tr>
+    `;
+
+    users.forEach(u => {
+      html += `
+        <tr>
+          <td>${u.id || '-'}</td>
+          <td>${u.username || '-'}</td>
+          <td>${u.email || '-'}</td>
+          <td>${u.updatedAt || '-'}</td>
+        </tr>`;
+    });
+    html += `</table>`;
+    box.innerHTML = html;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    box.innerHTML = "<span style='color:red;'>Error loading users.</span>";
+  }
+}
+
+
+        async function askGemini() {
+          const query = document.getElementById("geminiQuery").value.trim();
+          const responseBox = document.getElementById("geminiResponse");
+
+          if (!query) {
+            alert("Please enter a question!");
+            return;
+          }
+
+          responseBox.style.display = "block";
+          responseBox.innerHTML = "<em>Thinking...</em>";
+
+          try {
+            const response = await fetch(`http://localhost:8080/api/admin/gemini/ask?query=${encodeURIComponent(query)}`);
+            if (!response.ok) throw new Error("Gemini API failed");
+
+            let data = await response.text();
+            data = data.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            data = data.replace(/\n/g, "<br>");
+            responseBox.innerHTML = `<strong>Admin AI:</strong><br>${data}`;
+          } catch (error) {
+            console.error("Error:", error);
+            responseBox.innerHTML = "<span style='color:red;'>Something went wrong while processing your query.</span>";
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          checkLogin();
+          loadDashboardStats();
+        });
+    </script>
+</head>
+
+<body>
+<header>
+    <h1>🍲 Recipe Manager</h1>
+    <div class="nav-buttons">
+        <button onclick="viewProfile()">Profile</button>
+        <input type="text" id="geminiQuery" placeholder="Ask Admin (e.g., 'Top 3 categories')">
+        <button onclick="askGemini()" style="background:#007bff; color:white;">Ask</button>
+        <button onclick="showAllUsers()" style="background:#28a745; color:white;">Show All Users</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<div id="geminiResponse"></div>
+
+<section id="dashboard">
+    <div class="dash-card">
+        <h3>Total Recipes</h3>
+        <p id="totalRecipes">--</p>
+    </div>
+    <div class="dash-card">
+        <h3>Total Users</h3>
+        <p id="totalUsers">--</p>
+    </div>
+    <div class="dash-card">
+        <h3>Top Category</h3>
+        <p id="topCategory">--</p>
+    </div>
+</section>
+
+<div class="container">
+    <aside class="sidebar">
+        <h3>Category Guide</h3>
+        <ul>
+            <li onclick="filterCategory(1)">1 - Veg</li>
+            <li onclick="filterCategory(2)">2 - Non-Veg</li>
+            <li onclick="filterCategory(3)">3 - Seafood</li>
+            <li onclick="filterCategory(4)">4 - Street Food</li>
+            <li onclick="filterCategory(5)">5 - Tiffins</li>
+        </ul>
+    </aside>
+
+    <main>
+        <form id="recipeForm">
+            <input type="hidden" id="recipeId">
+            <input type="text" id="name" placeholder="Recipe Name" required>
+            <textarea id="description" placeholder="Description" required></textarea>
+            <textarea id="ingredients" placeholder="Ingredients" required></textarea>
+            <textarea id="steps" placeholder="Steps" required></textarea>
+            <input type="text" id="url" placeholder="Image URL (optional)">
+            <input type="number" id="categoryId" placeholder="Category ID" required>
+            <button type="submit">Add Recipe</button>
+        </form>
+
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search by recipe name...">
+            <button onclick="searchRecipe()">Search</button>
+        </div>
+
+        <h3>Recipe List</h3>
+        <ul id="recipeList"></ul>
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
