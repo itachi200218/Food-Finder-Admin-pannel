@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Authentication</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          background: linear-gradient(135deg, #74b9ff, #a29bfe);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .container {
+          display: flex;
+          justify-content: space-between;
+          align-items: stretch;
+          background: white;
+          padding: 40px;
+          border-radius: 20px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+          width: 900px;
+          gap: 40px;
+        }
+        .form-section {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        h2 {
+          text-align: center;
+          color: #2d3436;
+          font-size: 26px;
+          margin-bottom: 20px;
+        }
+        input {
+          width: 100%;
+          padding: 14px;
+          margin: 12px 0;
+          font-size: 16px;
+          border: 2px solid #dcdde1;
+          border-radius: 8px;
+          transition: 0.3s;
+        }
+        input:focus {
+          border-color: #0984e3;
+          outline: none;
+          box-shadow: 0 0 5px rgba(9, 132, 227, 0.4);
+        }
+        button {
+          width: 100%;
+          background: #0984e3;
+          color: white;
+          padding: 14px;
+          border: none;
+          border-radius: 8px;
+          font-size: 17px;
+          font-weight: bold;
+          cursor: pointer;
+          margin-top: 10px;
+          transition: background 0.3s, transform 0.1s;
+        }
+        button:hover {
+          background: #0652dd;
+          transform: scale(1.03);
+        }
+        .message {
+          text-align: center;
+          margin-top: 15px;
+          color: green;
+          font-size: 16px;
+          font-weight: 500;
+        }
+        .divider {
+          width: 2px;
+          background-color: #ddd;
+          margin: 0 15px;
+        }
+        .forgot-links {
+          text-align: center;
+          margin-top: 15px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        .forgot-links a {
+          color: #0652dd;
+          font-weight: 600;
+          text-decoration: none;
+        }
+        .forgot-links a:hover {
+          text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Register -->
+    <div class="form-section">
+        <h2>Register</h2>
+        <input type="text" id="regUsername" placeholder="Username" />
+        <input type="email" id="regEmail" placeholder="Email" />
+        <input type="password" id="regPassword" placeholder="Password" />
+        <button onclick="registerUser()">Register</button>
+    </div>
+    <div class="divider"></div>
+    <!-- Login -->
+    <div class="form-section">
+        <h2>Login</h2>
+        <input type="text" id="loginUsername" placeholder="Username" />
+        <input type="password" id="loginPassword" placeholder="Password" />
+        <button onclick="loginUser()">Login</button>
+
+        <div class="forgot-links">
+            <a href="forgot-username.html">Forgot Username?</a>
+            <a href="reset-password.html">Forgot Password?</a>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+</div>
+
+<script>
+    async function registerUser() {
+      const username = document.getElementById("regUsername").value;
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+      try {
+        const res = await fetch("http://localhost:8080/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password })
+        });
+        const msg = document.getElementById("message");
+        if (res.ok) {
+          const data = await res.json();
+          msg.innerText = `✅ Registered: ${data.username}`;
+          msg.style.color = "green";
+        } else {
+          msg.innerText = "❌ Registration failed";
+          msg.style.color = "red";
+        }
+      } catch {
+        msg.innerText = "❌ Server error";
+        msg.style.color = "red";
+      }
+    }
+
+    async function loginUser() {
+      const username = document.getElementById("loginUsername").value;
+      const password = document.getElementById("loginPassword").value;
+      const msg = document.getElementById("message");
+
+      try {
+        const res = await fetch("http://localhost:8080/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username, password })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("username", data.username);
+          msg.innerText = `✅ Logged in as ${data.username}`;
+          msg.style.color = "green";
+          setTimeout(() => window.location.href = "index.html", 1200);
+        } else {
+          msg.innerText = "❌ Invalid credentials";
+          msg.style.color = "red";
+        }
+      } catch {
+        msg.innerText = "❌ Server error during login";
+        msg.style.color = "red";
+      }
+    }
+</script>
+</body>
+</html>
