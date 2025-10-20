@@ -1,29 +1,32 @@
-# Food-Finder-API-Test
+AI-Integrated Admin Panel
 
-## 🛠️ Project Overview
-**Food-Finder-API-Test** is an **API automation project** for testing the backend of the Food Finder Recipe Application. It is built using **Java, RestAssured, and TestNG**. The project uses a **reusable API class** to simplify testing multiple endpoints like recipe details, suggestions, categories, and chatbot integration.
+🚀 A full-stack Admin Management System built with Spring Boot, MySQL, HTML, CSS, and JavaScript, integrated with Gemini AI for CRUD automation, schema explanations, and intelligent assistance — developed in just 5 days.
 
----
+⸻
 
-## 💻 Tech Stack
-- **Language:** Java  
-- **Testing Framework:** TestNG  
-- **API Automation:** RestAssured  
-- **Utilities:** Reusable API class (`ApiResuable`) for GET and POST requests  
-- **Tools:** JSON payloads for POST requests  
+⚙️ Tech Stack
+	•	Backend: Spring Boot (Java), JPA, REST APIs
+	•	Frontend: HTML, CSS, JavaScript
+	•	Database: MySQL
+	•	AI Integration: Gemini API
+	•	Security: BCrypt, Admin Access Control
 
----
+⸻
 
-## ⚡ Features
-- Automated testing of multiple API endpoints:  
-  - `/get-recipe-detail` – fetches recipe details by ID  
-  - `/get-recipes` – fetches recipes by category  
-  - `/get-suggestions` – fetches recipe suggestions based on query  
-  - `/chatbot-api` – tests chatbot functionality with prompt  
-- Supports **dynamic payloads** and header customization.  
-- Prints response **status code, endpoint, method, and body** for each request.  
-- Efficient execution of multiple API requests using a reusable API class.
+✨ Features
+	•	🔐 Authentication: Login, password reset, profile management
+	•	📊 Dashboard: Live recipe & user stats
+	•	🍳 Recipe Management: Full CRUD with auto-refresh
+	•	🧠 AI & KT Assistant:
+	•	Handles 30+ prompts (e.g., “show database structure”)
+	•	Executes CRUD via text commands
+	•	Explains tables and generates beginner-friendly code
+	•	🔒 Admin Security: Role-based access and gated sections
 
----
+Frontend → Controller → Service → Repository → MySQL → Gemini AI
 
-
+Highlights
+	•	AI executes & explains database actions
+	•	Dual-mode: structured (commands) + casual (chat)
+	•	Real-time analytics and smooth UI
+	•	Fully secure with hashed passwords
