@@ -1,4 +1,4 @@
-🔹 Admin Panel – AI Integrated Management System
+###🔹 Admin Panel – AI Integrated Management System
 
 A full-stack AI-powered Admin Management System for recipe and user control, featuring CRUD automation, live analytics, and a built-in Knowledge Transfer (KT) AI assistant .
 
