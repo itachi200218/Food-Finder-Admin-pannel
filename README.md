@@ -25,4 +25,3 @@ Frontend → Controller → Service → Repository → MySQL → Gemini AI
 Highlights:
 	•	Dual AI modes: Structured (commands) and Casual (chat)
 	•	Real-time updates and analytics
-	•	Completed in 5 days with full backend + AI integration
