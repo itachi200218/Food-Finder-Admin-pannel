@@ -3,3 +3,12 @@
 /workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+>>>>>>> de80e9f678c7fdc482bc3b4bfa83c067553f1c32
+>>>>>>> 3c81a1d91cffe532df58cf234858cec854f9c5b4
