@@ -13,30 +13,34 @@ public class User {
 
     private String name;
 
-    // ✅ Allow long text for ingredients
     @Column(columnDefinition = "TEXT")
     private String ingredients;
 
-    // ✅ Allow long text for description
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // ✅ Allow long text for steps
     @Column(columnDefinition = "TEXT")
     private String steps;
 
-    // ✅ URL is optional and up to 1000 characters
     @Column(nullable = true, length = 1000)
     private String url;
 
     @Column(name = "category_id")
     private int categoryId;
 
-    // ✅ Track creation and update times
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public User() {}
+
+    public User(String name, String ingredients, String description, String steps, String url, int categoryId) {
+        this.name = name;
+        this.ingredients = ingredients;
+        this.description = description;
+        this.steps = steps;
+        this.url = url;
+        this.categoryId = categoryId;
+    }
 
     @PrePersist
     protected void onCreate() {
@@ -49,7 +53,7 @@ public class User {
         updatedAt = LocalDateTime.now();
     }
 
-    // ✅ Getters and Setters
+    // Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

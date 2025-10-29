@@ -28,7 +28,7 @@ public class ServiceImpl implements UserService {
         return userRepository.findByCategoryId(categoryId);
     }
     @Override
-   public List<User> getUsersByCategoryName(String categoryName) {
+    public List<User> getUsersByCategoryName(String categoryName) {
         return userRepository.findByCategoryName(categoryName);
     }
     @Override
@@ -38,7 +38,7 @@ public class ServiceImpl implements UserService {
     }
 
     @Override
-   public User UpdateUser(int id, User user) {
+    public User UpdateUser(int id, User user) {
         User u = userRepository.findById(id).orElse(null);
         u.setName(user.getName());
         u.setIngredients(user.getIngredients());
