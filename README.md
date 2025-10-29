@@ -99,4 +99,4 @@ MySQL Database (Persistent Storage)
 
 ## 👨‍💻 Developer
 **Adepu Chaitanya**  
-Founder & Developer — *House of Data*  
+Founder & Developer — *Cognizant*  
