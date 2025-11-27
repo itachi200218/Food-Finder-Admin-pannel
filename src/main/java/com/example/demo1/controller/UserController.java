@@ -44,12 +44,12 @@ public class UserController {
     public void deleteuser(@PathVariable int id){
         userService.DeleteUser(id);
    }
-    @Controller
-    public class HomeController {
-        @GetMapping("/")
-        public String home() {
-            return "forward:/index.html";
-        }
-    }
+//    @Controller
+//    public class HomeController {
+//        @GetMapping("/")
+//        public String home() {
+//            return "forward:/index.html";
+//        }
+//    }
 
 }

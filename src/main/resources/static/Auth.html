@@ -71,7 +71,6 @@
         .message {
           text-align: center;
           margin-top: 15px;
-          color: green;
           font-size: 16px;
           font-weight: 500;
         }
@@ -130,13 +129,14 @@
       const username = document.getElementById("regUsername").value;
       const email = document.getElementById("regEmail").value;
       const password = document.getElementById("regPassword").value;
+      const msg = document.getElementById("message");
+
       try {
         const res = await fetch("http://localhost:8080/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, email, password })
         });
-        const msg = document.getElementById("message");
         if (res.ok) {
           const data = await res.json();
           msg.innerText = `✅ Registered: ${data.username}`;
@@ -163,11 +163,18 @@
           credentials: "include",
           body: JSON.stringify({ username, password })
         });
+
         if (res.ok) {
           const data = await res.json();
-          localStorage.setItem("username", data.username);
+
+          // ✅ Store per-tab login
+         localStorage.setItem("isUserLoggedIn", "true"); // global
+sessionStorage.setItem("isUserLoggedIn_tab", "true"); // this tab
+
+
           msg.innerText = `✅ Logged in as ${data.username}`;
           msg.style.color = "green";
+
           setTimeout(() => window.location.href = "index.html", 1200);
         } else {
           msg.innerText = "❌ Invalid credentials";

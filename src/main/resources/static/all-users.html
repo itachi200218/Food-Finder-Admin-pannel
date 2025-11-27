@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Users - Admin View</title>
+    <style>
+        body {font-family:Poppins,sans-serif; background:#f4f4f9; margin:0; padding:20px; color:#333;}
+        h2 {text-align:center; margin-bottom:30px;}
+        table {width:90%; margin:20px auto; border-collapse:collapse; background:white; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+        th,td {padding:12px; border-bottom:1px solid #ddd; text-align:center;}
+        th {background:#007BFF; color:white;}
+        tr:hover {background:#f1f1f1;}
+        button {background:#007BFF; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; display:block; margin:20px auto;}
+        button:hover {background:#0056b3;}
+    </style>
+</head>
+<body>
+
+<h2>👑 All Users Overview</h2>
+<div id="userContent">Loading users...</div>
+<button onclick="goHome()">🏠 Home</button>
+
+<script>
+
+    /* --------------------------------------------------------
+       🔐 FIXED LOGIN SYSTEM (correct order)
+       -------------------------------------------------------- */
+
+    const isUserLoggedIn = sessionStorage.getItem("isUserLoggedIn_tab");
+    const isAdminLoggedIn = sessionStorage.getItem("isAdminLoggedIn_tab");
+
+    // STEP 1: Must be logged in as user
+    if (!isUserLoggedIn) {
+        window.location.replace("Auth.html");
+    }
+    // STEP 2: User logged in → now check admin
+    else if (!isAdminLoggedIn) {
+        window.location.replace("admin-login.html");
+    }
+    // STEP 3: Both verified → Load all users
+    else {
+        loadAllUsers();
+    }
+
+
+    /* --------------------------------------------------------
+       🚀 Load Users From Both Backends
+       -------------------------------------------------------- */
+
+    async function loadAllUsers() {
+        const box = document.getElementById("userContent");
+        box.innerHTML = "<em>Loading all users...</em>";
+
+        try {
+            // Fetch Admin Users
+            const adminRes = await fetch("http://localhost:8080/api/auth/users");
+            if (!adminRes.ok) throw new Error("Error loading admin users");
+            const adminUsers = await adminRes.json();
+
+            // Fetch Flask Users
+            const flaskRes = await fetch("http://localhost:8080/api/flask/users");
+            if (!flaskRes.ok) throw new Error("Error loading Flask users");
+            const flaskUsers = await flaskRes.json();
+
+            // Build Admin Users table
+            let html = `
+                <h3>👑 Admin Panel Users</h3>
+                <table>
+                    <tr><th>ID</th><th>Username</th><th>Email</th><th>Last Updated</th></tr>
+            `;
+            adminUsers.forEach(u => {
+                html += `
+                    <tr>
+                        <td>${u.id || '-'}</td>
+                        <td>${u.username || '-'}</td>
+                        <td>${u.email || '-'}</td>
+                        <td>${u.updatedAt || '-'}</td>
+                    </tr>
+                `;
+            });
+            html += `</table>`;
+
+            // Build Flask Users table
+            html += `
+                <h3>🔥 Flask Site Users</h3>
+                <table>
+                    <tr><th>ID</th><th>Username</th><th>Email</th><th>Joined Date</th></tr>
+            `;
+            flaskUsers.forEach(u => {
+                html += `
+                    <tr>
+                        <td>${u.id || '-'}</td>
+                        <td>${u.username || '-'}</td>
+                        <td>${u.email || '-'}</td>
+                        <td>${u.createdAt || u.created_at || '-'}</td>
+                    </tr>
+                `;
+            });
+            html += `</table>`;
+
+            box.innerHTML = html;
+
+        } catch (err) {
+            console.error(err);
+            box.innerHTML = "<span style='color:red;'>❌ Error loading users.</span>";
+        }
+    }
+
+    function goHome() {
+        window.location.href = "index.html";
+    }
+</script>
+
+</body>
+</html>

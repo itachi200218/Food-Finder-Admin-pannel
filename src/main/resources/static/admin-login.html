@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <style>
+        body {
+            font-family: Poppins, sans-serif;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        input {
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            margin: 10px 0;
+            width: 200px;
+            text-align: center;
+        }
+        button {
+            background: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .error {
+            color: #ff7777;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>🔐 Admin Access</h2>
+    <p>Enter your admin password to view all users</p>
+    <input type="password" id="adminPassword" placeholder="Enter password" />
+    <br>
+    <button id="loginBtn" onclick="verifyPassword()">Login</button>
+    <p id="error" class="error"></p>
+</div>
+
+<script>
+
+    /* ✅ FIXED — SAFE CHECK (no document.write) */
+    if (!sessionStorage.getItem("isUserLoggedIn_tab")) {
+        window.location.replace("Auth.html");
+    }
+
+    const ADMIN_PASSWORD = "admin123";
+    const MAX_ATTEMPTS = 3;
+    const TIMEOUTS = [1, 2, 5, 10, 20];
+    const STORAGE_KEY = "adminLoginData";
+
+    function getLoginData() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+            attempts: 0,
+            lockLevel: 0,
+            lockUntil: null
+        };
+    }
+
+    function saveLoginData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function checkLockStatus() {
+        const data = getLoginData();
+        const now = Date.now();
+
+        if (data.lockUntil && now < data.lockUntil) {
+            const remaining = Math.ceil((data.lockUntil - now) / 1000);
+            disableLogin(remaining);
+            return true;
+        } else if (data.lockUntil && now >= data.lockUntil) {
+            data.attempts = 0;
+            data.lockUntil = null;
+            saveLoginData(data);
+        }
+        return false;
+    }
+
+    function disableLogin(seconds) {
+        const btn = document.getElementById("loginBtn");
+        const error = document.getElementById("error");
+        btn.disabled = true;
+
+        const countdown = setInterval(() => {
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                btn.disabled = false;
+                error.textContent = "";
+            } else {
+                error.textContent = `⏳ Too many attempts! Try again in ${seconds}s`;
+                seconds--;
+            }
+        }, 1000);
+    }
+
+    function verifyPassword() {
+        if (checkLockStatus()) return;
+
+        const input = document.getElementById("adminPassword").value.trim();
+        const error = document.getElementById("error");
+        const data = getLoginData();
+
+        if (input === ADMIN_PASSWORD) {
+            sessionStorage.setItem("isAdminLoggedIn_tab", "true");
+            localStorage.removeItem(STORAGE_KEY);
+            window.location.href = "all-users.html";  /* ✅ Redirect works perfectly */
+        } else {
+            data.attempts++;
+            if (data.attempts >= MAX_ATTEMPTS) {
+                const level = Math.min(data.lockLevel, TIMEOUTS.length - 1);
+                const minutes = TIMEOUTS[level];
+                data.lockUntil = Date.now() + minutes * 60 * 1000;
+                data.lockLevel = Math.min(data.lockLevel + 1, TIMEOUTS.length - 1);
+                data.attempts = 0;
+                saveLoginData(data);
+                disableLogin(minutes * 60);
+            } else {
+                saveLoginData(data);
+                error.textContent = `❌ Incorrect password! Attempts left: ${MAX_ATTEMPTS - data.attempts}`;
+            }
+        }
+    }
+
+    checkLockStatus();
+</script>
+
+</body>
+</html>

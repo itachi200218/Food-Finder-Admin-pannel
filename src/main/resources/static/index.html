@@ -164,61 +164,76 @@
           }
         }
 
-        // ✅ Show all users from backend (no password prompt)
-    async function showAllUsers() {
-  const box = document.getElementById("geminiResponse");
+<!--        // ✅ Show all users from backend (no password prompt)-->
+<!--  // ✅ Show both Admin and Flask users in separate tables-->
+<!--async function showAllUsers() {-->
+<!--  const box = document.getElementById("geminiResponse");-->
 
-  // Ask for admin password
-  const password = prompt("🔐 Please enter admin password to view all users:");
-  if (!password) {
-    alert("Password is required to view users.");
-    return;
-  }
+<!--  // Ask for admin password-->
+<!--  const password = prompt("🔐 Please enter admin password to view all users:");-->
+<!--  if (!password) {-->
+<!--    alert("Password is required to view users.");-->
+<!--    return;-->
+<!--  }-->
 
-  box.style.display = "block";
-  box.innerHTML = "<em>Verifying password...</em>";
+<!--  box.style.display = "block";-->
+<!--  box.innerHTML = "<em>Verifying password...</em>";-->
 
-  // Check password before fetching users
-  const ADMIN_PASSWORD = "admin123"; // keep it same as backend or send to backend for verification
-  if (password !== ADMIN_PASSWORD) {
-    box.innerHTML = "<span style='color:red;'>❌ Incorrect password. Access denied.</span>";
-    return;
-  }
+<!--  const ADMIN_PASSWORD = "admin123";-->
+<!--  if (password !== ADMIN_PASSWORD) {-->
+<!--    box.innerHTML = "<span style='color:red;'>❌ Incorrect password. Access denied.</span>";-->
+<!--    return;-->
+<!--  }-->
 
-  box.innerHTML = "<em>Loading all users...</em>";
+<!--  box.innerHTML = "<em>Loading all users...</em>";-->
 
-  try {
-    const res = await fetch("http://localhost:8080/api/auth/users");
-    if (!res.ok) throw new Error("Failed to fetch users");
-    const users = await res.json();
+<!--  try {-->
+<!--    // Fetch Admin Users-->
+<!--    const adminRes = await fetch("http://localhost:8080/api/auth/users");-->
+<!--    if (!adminRes.ok) throw new Error("Failed to fetch admin users");-->
+<!--    const adminUsers = await adminRes.json();-->
 
-    if (!Array.isArray(users) || users.length === 0) {
-      box.innerHTML = "<strong>No users found.</strong>";
-      return;
-    }
+<!--    // Fetch Flask Users-->
+<!--    const flaskRes = await fetch("http://localhost:8080/api/flask/users");-->
+<!--    if (!flaskRes.ok) throw new Error("Failed to fetch Flask users");-->
+<!--    const flaskUsers = await flaskRes.json();-->
 
-    let html = `
-      <h3>All Users</h3>
-      <table>
-        <tr><th>ID</th><th>Username</th><th>Email</th><th>Last Updated</th></tr>
-    `;
+<!--    // Build Admin Users table-->
+<!--    let html = `<h3>👑 Admin Panel Users</h3>-->
+<!--    <table>-->
+<!--      <tr><th>ID</th><th>Username</th><th>Email</th><th>Last Updated</th></tr>`;-->
+<!--    adminUsers.forEach(u => {-->
+<!--      html += `<tr>-->
+<!--        <td>${u.id || '-'}</td>-->
+<!--        <td>${u.username || '-'}</td>-->
+<!--        <td>${u.email || '-'}</td>-->
+<!--        <td>${u.updatedAt || '-'}</td>-->
+<!--      </tr>`;-->
+<!--    });-->
+<!--    html += `</table>`;-->
 
-    users.forEach(u => {
-      html += `
-        <tr>
-          <td>${u.id || '-'}</td>
-          <td>${u.username || '-'}</td>
-          <td>${u.email || '-'}</td>
-          <td>${u.updatedAt || '-'}</td>
-        </tr>`;
-    });
-    html += `</table>`;
-    box.innerHTML = html;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    box.innerHTML = "<span style='color:red;'>Error loading users.</span>";
-  }
-}
+<!--    // Build Flask Users table-->
+<!--    html += `<h3>🔥 Flask Site Users</h3>-->
+<!--    <table>-->
+<!--      <tr><th>ID</th><th>Username</th><th>Email</th><th>Joined Date</th></tr>`;-->
+<!--    flaskUsers.forEach(u => {-->
+<!--      html += `<tr>-->
+<!--        <td>${u.id || '-'}</td>-->
+<!--        <td>${u.username || '-'}</td>-->
+<!--        <td>${u.email || '-'}</td>-->
+<!--        <td>${u.createdAt || '-'}</td>-->
+
+<!--      </tr>`;-->
+<!--    });-->
+<!--    html += `</table>`;-->
+
+<!--    box.innerHTML = html;-->
+
+<!--  } catch (error) {-->
+<!--    console.error("Error fetching users:", error);-->
+<!--    box.innerHTML = "<span style='color:red;'>Error loading users.</span>";-->
+<!--  }-->
+<!--}-->
 
 
         async function askGemini() {
@@ -261,7 +276,7 @@
         <button onclick="viewProfile()">Profile</button>
         <input type="text" id="geminiQuery" placeholder="Ask Admin (e.g., 'Top 3 categories')">
         <button onclick="askGemini()" style="background:#007bff; color:white;">Ask</button>
-        <button onclick="showAllUsers()" style="background:#28a745; color:white;">Show All Users</button>
+        <button onclick="window.location.href='admin-login.html'" style="background:#28a745; color:white;">Show All Users</button>
         <button onclick="logout()">Logout</button>
     </div>
 </header>
